@@ -235,7 +235,7 @@ namespace JPBotelho
 
 			if (GUILayout.Button("Open Trash"))
 			{
-				FileFunctions.OpenFolder(RecycleBinFunctions.GetRecycleBin(true));
+				FileFunctions.OpenFolder(RecycleBinFunctions.GetRecycleBinAndCreateIfNull());
 			}
 
 			EditorGUILayout.EndVertical();

@@ -27,7 +27,7 @@ namespace JPBotelho
 		[MenuItem("Window/Recycle Bin/Open Folder")]
 		public static void OpenTrash()
 		{
-			FileFunctions.OpenFolder(RecycleBinFunctions.GetRecycleBin(true));
+			FileFunctions.OpenFolder(RecycleBinFunctions.GetRecycleBinAndCreateIfNull());
 		}
 	}
 }

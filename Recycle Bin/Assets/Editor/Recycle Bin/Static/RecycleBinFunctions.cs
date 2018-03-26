@@ -9,7 +9,7 @@ namespace JPBotelho
 	{
 		public static string recycleBin
 		{
-			get { return GetRecycleBin(false); }
+			get { return GetRecycleBinAndCreateIfNull(); }
 		}
 
 		public static RecycleBinPreferences recycleBinPreferences
@@ -27,14 +27,13 @@ namespace JPBotelho
 		/// </summary>
 		/// <param name="create">Create folder if it doesn't exist.</param>
 		/// <returns></returns>
-		public static string GetRecycleBin(bool createDirectoryIfNull)
+		public static string GetRecycleBinAndCreateIfNull()
 		{
 			string expectedRecycleBinPath = Path.Combine(projectFolder, recycleBinPreferences.folderName);
 
 			if (!Directory.Exists(expectedRecycleBinPath))
 			{
-				if (createDirectoryIfNull)
-					CreateRecycleBinDirectory();
+				return CreateRecycleBinDirectory();
 			}
 
 			return expectedRecycleBinPath;
@@ -43,9 +42,13 @@ namespace JPBotelho
 		/// <summary>
 		/// Creates a Trash Folder
 		/// </summary>
-		public static void CreateRecycleBinDirectory()
+		public static string CreateRecycleBinDirectory()
 		{
-			Directory.CreateDirectory(Path.Combine(projectFolder, recycleBinPreferences.folderName));
+			string finalPath = Path.Combine(projectFolder, recycleBinPreferences.folderName);
+			
+            Directory.CreateDirectory(Path.Combine(projectFolder, recycleBinPreferences.folderName));
+
+			return finalPath;
 		}
 
 		/// <summary>
@@ -118,7 +121,7 @@ namespace JPBotelho
 			{
 				DirectoryInfo currentDirectory = new DirectoryInfo(assetPath);
 
-				string recycleBinPath = GetRecycleBin(true);
+				string recycleBinPath = recycleBin;
 				string pathInRecycleBin = Path.Combine(recycleBinPath, assetPath);
 
 				DirectoryInfo finalDirectory = new DirectoryInfo(pathInRecycleBin);
@@ -128,7 +131,7 @@ namespace JPBotelho
 			{   //Just a couple checks based on file's extension
 				if (recycleBinPreferences.IsEligibleToSave(file))
 				{
-					CopyFileOrDirectory(assetPath, new DirectoryInfo(GetRecycleBin(true)));
+					CopyFileOrDirectory(assetPath, new DirectoryInfo(recycleBin));
 				}
 
 				FileUtil.DeleteFileOrDirectory(assetPath);
@@ -223,7 +226,7 @@ namespace JPBotelho
 		{
 			List<TrashFile> trashFiles = new List<TrashFile>();
 
-			string pathToRecycleBin = GetRecycleBin(false);
+			string pathToRecycleBin = recycleBin;
 
 			List<string> recycleBinMembers = FileFunctions.GetFilesAndDirectories(new DirectoryInfo(pathToRecycleBin));
 
