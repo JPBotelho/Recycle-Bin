@@ -294,11 +294,11 @@ namespace JPBotelho
 		{
 			if (!IsDirectory(path))
 			{
-				FileFunctions.CopyFile(path, to);
+				FileFunctions.CopyFileOrDirectory(path, to);
 			}
 			else
 			{
-				FileFunctions.CopyDirectory(path, to);
+				FileFunctions.CopyFileOrDirectory(path, to);
 			}
 		}
 	}

@@ -43,74 +43,56 @@ namespace JPBotelho
 			return paths;
 		}
 
-		public static void CopyFile(string path, DirectoryInfo to)
+		//Copies files or directories to a target directory. 
+		//Members with the same name get (X) added after.
+		//Recursive behaviour is handled by unity's CopyFileOrDirectory (doesn't handle matching names, hence this function)-
+		public static void CopyFileOrDirectory(string path, DirectoryInfo to)
 		{
-			FileInfo info = new FileInfo(path);
+			//Directories need some separate logic, but the implementation is the same.
+			bool isDirectory = RecycleBinFunctions.IsDirectory(path);
 
-			string first = Path.Combine(to.FullName, info.Name);
+			//If it's a file it will have extension, else it won't, so no need to use DirectoryInfo
+			FileInfo file = new FileInfo(path);
 
-			if (File.Exists(first))
+			string targetPath = Path.Combine(to.FullName, file.Name);
+
+			//File does not yet exist, we can copy it right away.
+			//Else: File already exists, we need to add (X) in front of it. E.g. MyFile (1).png
+			if (!File.Exists(targetPath) && !Directory.Exists(targetPath))
+			{
+				FileUtil.CopyFileOrDirectory(path, targetPath);
+			}
+			else
 			{
 				int i = 1;
+				string newFinalName;
+				string finalDestination;
 
-				//Remove the extension
-				string replace = path.Replace(info.Extension, "");
+				//If it is a directory, we can keep the full name and add (1) after.
+				//If it is a file, we need to remove the extension.
+				string name = isDirectory ? file.FullName : path.Replace(file.Extension, "");
 
-				string newName;
-
+				//In files, we need to add the extension after (1).
+				string extension = isDirectory ? "" : file.Extension;
+			
 				while (true)
 				{
-					//        MyFile         (i)        .extension
-					newName = replace + " (" + i + ")" + info.Extension;
+					//            MyFile        (i)       .extension
+					newFinalName = name + " (" + i + ")" + extension;
 
-					string currentDestination = Path.Combine(to.FullName, new FileInfo(newName).Name);
+					//We can create a FileInfo even if it's a directory. We just need the name.
+					finalDestination = Path.Combine(to.FullName, new FileInfo(newFinalName).Name);
 
-					if (File.Exists(currentDestination))
+					//If something already has that name, keep iterating.
+					if (File.Exists(finalDestination) || Directory.Exists(finalDestination))
 						i++;
 					else
 						break;
 				}
 
-				FileUtil.CopyFileOrDirectory(path, Path.Combine(to.FullName, new FileInfo(newName).Name));
+				FileUtil.CopyFileOrDirectory(path, finalDestination);
 			}
-			else
-			{
-				FileUtil.CopyFileOrDirectory(path, first);
-			}
-		}
-
-		public static void CopyDirectory(string path, DirectoryInfo to)
-		{
-			DirectoryInfo info = new DirectoryInfo(path);
-
-			string destination = Path.Combine(to.FullName, info.Name);
-
-			if (Directory.Exists(destination))
-			{
-				int i = 1;
-
-				string replace = path.Replace(info.Extension, "");
-
-				string newName;
-
-				while (true)
-				{
-					newName = replace + " (" + i + ")" + info.Extension;
-
-					string currentDestination = Path.Combine(to.FullName, new DirectoryInfo(newName).Name);
-
-					if (Directory.Exists(currentDestination))
-						i++;
-					else
-						break;
-				}
-
-				FileUtil.CopyFileOrDirectory(path, Path.Combine(to.FullName, new DirectoryInfo(newName).Name));
-			}
-			else
-			{
-				FileUtil.CopyFileOrDirectory(path, destination);
-			}
+			
 		}
 	}
 }
