@@ -1,30 +1,33 @@
 ﻿using UnityEditor;
 
 
-public class DropdownMenu : EditorWindow
+namespace JPBotelho
 {
-    [MenuItem("Window/Recycle Bin/Show")]
-    public static void ShowWindow ()
-    {
-        string path = AssetDatabase.GetAssetPath(RecycleBinFunctions.GetRecycleBinPreferences());
+	public class DropdownMenu : EditorWindow
+	{
+		[MenuItem("Window/Recycle Bin/Show")]
+		public static void ShowWindow()
+		{
+			string path = AssetDatabase.GetAssetPath(RecycleBinFunctions.GetRecycleBinPreferences());
 
-        if (!string.IsNullOrEmpty(path))
-        {
-            Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(path);
-        }
-        else
-        {
-			RecycleBinFunctions.CreateRecycleBinPreferences(out path);
+			if (!string.IsNullOrEmpty(path))
+			{
+				Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(path);
+			}
+			else
+			{
+				RecycleBinFunctions.CreateRecycleBinPreferences(out path);
 
-			Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(path);
-        }
+				Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(path);
+			}
 
-        RecycleBinFunctions.RefreshSearch("");
-    }
+			RecycleBinFunctions.RefreshSearch("");
+		}
 
-    [MenuItem("Window/Recycle Bin/Open Folder")]
-    public static void OpenTrash ()
-    {
-        RecycleBinFunctions.OpenFolder(RecycleBinFunctions.GetRecycleBin(true));
-    }
+		[MenuItem("Window/Recycle Bin/Open Folder")]
+		public static void OpenTrash()
+		{
+			FileFunctions.OpenFolder(RecycleBinFunctions.GetRecycleBin(true));
+		}
+	}
 }

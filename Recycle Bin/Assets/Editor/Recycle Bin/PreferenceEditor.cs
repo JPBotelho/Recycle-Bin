@@ -3,353 +3,356 @@ using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(RecycleBinPreferences))]
-public class PreferenceEditor : Editor 
+namespace JPBotelho
 {
-    SerializedProperty all;
-    SerializedProperty none;
-    SerializedProperty name_;
-    SerializedProperty search;
+	[CustomEditor(typeof(RecycleBinPreferences))]
+	public class PreferenceEditor : Editor
+	{
+		SerializedProperty all;
+		SerializedProperty none;
+		SerializedProperty name_;
+		SerializedProperty search;
 
-    public static GUIStyle skin = new GUIStyle();
-                
-    bool settings; //Foldout
-    RecycleBinPreferences pref;
+		public static GUIStyle skin = new GUIStyle();
 
-    bool showSubfolders = true;
-    bool showDate = true;
+		bool settings; //Foldout
+		RecycleBinPreferences pref;
 
-    Texture folder;
-    Texture file;
+		bool showSubfolders = true;
+		bool showDate = true;
 
-    string recycleBin;    
+		Texture folder;
+		Texture file;
 
-    public void OnEnable ()
-    {
-        recycleBin = RecycleBinFunctions.recycleBin;
+		string recycleBin;
 
-        showSubfolders = EditorPrefs.GetBool("show");
-        showDate = EditorPrefs.GetBool("date");
+		public void OnEnable()
+		{
+			recycleBin = RecycleBinFunctions.recycleBin;
 
-        pref = (RecycleBinPreferences)target;
-        
-        skin.alignment = TextAnchor.MiddleCenter;
-        skin.fontStyle = FontStyle.Bold;
+			showSubfolders = EditorPrefs.GetBool("show");
+			showDate = EditorPrefs.GetBool("date");
 
-        folder = (Texture)AssetDatabase.LoadMainAssetAtPath("Assets/folder.png");
-        file = (Texture)AssetDatabase.LoadMainAssetAtPath("Assets/file.png");
+			pref = (RecycleBinPreferences)target;
 
-        all = serializedObject.FindProperty("saveAll");
-        none = serializedObject.FindProperty("saveNone");
-        name_ = serializedObject.FindProperty("folderName");
-        search = serializedObject.FindProperty("search");
+			skin.alignment = TextAnchor.MiddleCenter;
+			skin.fontStyle = FontStyle.Bold;
 
-        RecycleBinFunctions.RefreshSearch("");
-    }
+			folder = (Texture)AssetDatabase.LoadMainAssetAtPath("Assets/folder.png");
+			file = (Texture)AssetDatabase.LoadMainAssetAtPath("Assets/file.png");
 
-    public override void OnInspectorGUI ()
-    {        
-        serializedObject.Update();    
+			all = serializedObject.FindProperty("saveAll");
+			none = serializedObject.FindProperty("saveNone");
+			name_ = serializedObject.FindProperty("folderName");
+			search = serializedObject.FindProperty("search");
 
-        EditorGUILayout.LabelField("Recycle Bin", EditorStyles.centeredGreyMiniLabel);
+			RecycleBinFunctions.RefreshSearch("");
+		}
 
-        settings = EditorGUILayout.Foldout(settings, "Settings");
+		public override void OnInspectorGUI()
+		{
+			serializedObject.Update();
 
-        if (settings)
-        {
-            EditorGUI.indentLevel++;
+			EditorGUILayout.LabelField("Recycle Bin", EditorStyles.centeredGreyMiniLabel);
 
-            EditorGUILayout.Space();
+			settings = EditorGUILayout.Foldout(settings, "Settings");
 
-                EditorGUILayout.PropertyField(name_, new GUIContent("Folder Name"));
+			if (settings)
+			{
+				EditorGUI.indentLevel++;
 
-            EditorGUILayout.Space();
+				EditorGUILayout.Space();
 
-                EditorGUILayout.LabelField("Path:");
-                EditorGUILayout.LabelField(recycleBin);
+				EditorGUILayout.PropertyField(name_, new GUIContent("Folder Name"));
 
-            EditorGUILayout.Space();
+				EditorGUILayout.Space();
 
-                //Draw everything besides script name and deleted file list. This way there's no need to reimplement arrays of strings for the extensions.
-                DrawPropertiesExcluding(serializedObject, new string[] { "m_Script", "trash" }); 
+				EditorGUILayout.LabelField("Path:");
+				EditorGUILayout.LabelField(recycleBin);
 
-            EditorGUILayout.Space();
+				EditorGUILayout.Space();
 
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+				//Draw everything besides script name and deleted file list. This way there's no need to reimplement arrays of strings for the extensions.
+				DrawPropertiesExcluding(serializedObject, new string[] { "m_Script", "trash" });
 
-                EditorGUILayout.PropertyField(all, new GUIContent("Save All"));
-                EditorGUILayout.PropertyField(none, new GUIContent("Discard All"));
+				EditorGUILayout.Space();
 
-            EditorGUILayout.EndVertical();
+				EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
-            EditorGUILayout.Space();
-            EditorGUILayout.Space();
-            
-            EditorGUI.indentLevel--;
-        }
-               
-        EditorGUILayout.Space();
+				EditorGUILayout.PropertyField(all, new GUIContent("Save All"));
+				EditorGUILayout.PropertyField(none, new GUIContent("Discard All"));
 
-            List<TrashFile> list = pref.trash;
+				EditorGUILayout.EndVertical();
 
-        EditorGUILayout.Space();
+				EditorGUILayout.Space();
+				EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("Trash", skin);
+				EditorGUI.indentLevel--;
+			}
 
-        EditorGUILayout.Space();
+			EditorGUILayout.Space();
 
-        EditorGUI.BeginChangeCheck();
+			List<TrashFile> list = pref.trash;
 
-            //Search field
-            EditorGUILayout.PropertyField(search, new GUIContent("Search"));
+			EditorGUILayout.Space();
 
-        EditorGUILayout.Space();
+			EditorGUILayout.LabelField("Trash", skin);
 
-            //View folder content/data fields
-            showSubfolders = EditorGUILayout.Toggle(new GUIContent("View Folder Content"), showSubfolders);
-            showDate = EditorGUILayout.Toggle(new GUIContent("View Date"), showDate);
-
-
-        if (EditorGUI.EndChangeCheck())
-        {
-            serializedObject.ApplyModifiedProperties();
-            RecycleBinFunctions.RefreshSearch(pref.search);
-        }
-
-        EditorGUILayout.Space();
-        EditorGUILayout.Space();
-
-        //Draws files and directories.
-        for (int i = 0; i < list.Count; i++)
-        {
-            if (!RecycleBinFunctions.IsDirectory(list[i].path))
-            {
-                DrawFile(list[i].path, true, true);
-            }
-            else
-            {
-                DrawFolderRecursive(new DirectoryInfo(list[i].path), true);                
-            }
-
-            EditorGUILayout.Space();
-        }
-
-        EditorGUILayout.Space();
-
-		    //Draws Delete / Restore All 
-		    DrawButtons(); 
-
-        EditorGUILayout.Space();
-        EditorGUILayout.Space();
-        EditorGUILayout.Space();
-        EditorGUILayout.Space();
-
-            EditorPrefs.SetBool("show", showSubfolders);
-            EditorPrefs.SetBool("date", showDate);
-
-        serializedObject.ApplyModifiedProperties();
-    }
-
-    // Draws file. 
-    // parameter box: draws bounding box.
-    // parameter button: draws delete/restore buttons.
-    void DrawFile (string path, bool box, bool button)
-    {
-        FileInfo info = new FileInfo(path);
-
-        if (!box)
-        {
-            GUILayout.Label(new GUIContent("   " + Path.GetFileName(path), file));
-            
-            GUILayout.BeginHorizontal();
-
-            if (button)
-            {
-                if (GUILayout.Button("Delete"))
-                {
-                    Delete(new FileInfo(path));
-                }
-
-                if (GUILayout.Button("Restore"))
-                {
-                    Restore(new FileInfo(path));
-                }
-            }
-
-            GUILayout.EndHorizontal();
-        }
-        else
-        {
-            EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
-
-            GUILayout.Label(new GUIContent("  " + Path.GetFileName(path), file));
-
-            if (showDate)
-            {
-                GUILayoutOption date = GUILayout.Width(120);
-                GUILayout.Label(RecycleBinFunctions.FormatDate (info.LastAccessTime), date);
-            }
-
-            GUILayoutOption option = GUILayout.Width(65);
-
-            if (GUILayout.Button(new GUIContent("Delete"), option))
-            {
-                Delete(new FileInfo(path));
-            }
-            if (GUILayout.Button(new GUIContent("Restore"), option))
-            {
-                Restore(new FileInfo(path));
-            }
-
-            EditorGUILayout.EndHorizontal();
-        }
-    }
-
-    //Draws delete/restore/open buttons.
-    private void DrawButtons ()
-    {
-        EditorGUILayout.BeginVertical();
-        EditorGUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Delete All"))
-        {
-            if (EditorUtility.DisplayDialog("Delete Trash?", "Are you sure you want to complete this action?", "Yes", "No"))
-            {
-                RecycleBinFunctions.ClearTrash();
-            }
-        }
-
-        if (GUILayout.Button("Restore All"))
-        {
-            if (EditorUtility.DisplayDialog("Restore Trash?", "Are you sure you want to complete this action?", "Yes", "No"))
-            {
-                RecycleBinFunctions.CopyFilesFromBinToAssetsFolder();
-            }
-        }
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.Space();
-
-        if (GUILayout.Button("Open Trash"))
-        {
-            RecycleBinFunctions.OpenFolder(RecycleBinFunctions.GetRecycleBin(true));
-        }
-
-        EditorGUILayout.EndVertical();
-    }
-
-    private void DrawFolderRecursive (DirectoryInfo info, bool buttons)
-    {
-        if (Directory.Exists(info.FullName))
-        {
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-
-            EditorGUILayout.BeginHorizontal();
-
-            GUILayout.Label(new GUIContent("  " + info.Name, folder));
-
-            
-            if (buttons)
-            {
-                if (showDate)
-                {
-                    GUILayoutOption date = GUILayout.Width(120);
-
-                    GUILayout.Label(RecycleBinFunctions.FormatDate(info.LastAccessTime), date);
-                }
-
-                GUILayoutOption option = GUILayout.Width(65);
-
-                if (GUILayout.Button(new GUIContent("Delete"), option))
-                {
-                    Delete(info);
-                }
-
-                if (GUILayout.Button(new GUIContent("Restore"), option))
-                {
-                    Restore(info);
-                }
-            }        
-
-            EditorGUILayout.EndHorizontal();
-
-            if (showSubfolders)
-            {
-                if (Directory.Exists(info.FullName)) //Doesnt Draw Subfolders if parent was deleted, calling GetFiles or GetDirectories on an invalid folder throws exceptions
-                {
-                    foreach (FileInfo file in info.GetFiles())
-                    {
-                        EditorGUI.indentLevel++;
-
-                        EditorGUILayout.BeginHorizontal();
-                            GUILayout.Space(30);
-                            DrawFile(file.FullName, false, false);
-                        EditorGUILayout.EndHorizontal();
-                        EditorGUI.indentLevel--;
-
-                        GUILayout.Space(5);
-                    }
-
-                    foreach (DirectoryInfo dir in info.GetDirectories())
-                    {
-                        EditorGUILayout.BeginHorizontal();
-                            GUILayout.Space(30);
-                            DrawFolderRecursive(dir, false);
-                        EditorGUILayout.EndHorizontal();
-
-                        GUILayout.Space(5);
-                    }
-                }
-            }
-            EditorGUI.indentLevel--;
-
-            EditorGUILayout.EndVertical();
-        }
-    }      
-
-    void Delete (DirectoryInfo info)
-    {
-        if (EditorUtility.DisplayDialog("Recycle Bin", "Delete " + info.Name + "?", "Yes", "No"))
-        {
-            FileUtil.DeleteFileOrDirectory(info.FullName);
-
-            RecycleBinFunctions.RefreshSearch("");
-        }        
-    }
-
-    void Delete (FileInfo info)
-    {
-        if (EditorUtility.DisplayDialog("Recycle Bin", "Delete " + info.Name + "?", "Yes", "No"))
-        {
-            FileUtil.DeleteFileOrDirectory(info.FullName);
-
-            RecycleBinFunctions.RefreshSearch("");
-        }
-    }
-
-    void Restore (FileInfo info)
-    {
-        if (EditorUtility.DisplayDialog("Recycle Bin", "Restore " + info.Name + "?", "Yes", "No"))
-        {
-            FileUtil.CopyFileOrDirectory(info.FullName, Path.Combine(Application.dataPath, info.Name));
-            FileUtil.DeleteFileOrDirectory(info.FullName);
-
-            AssetDatabase.Refresh();
-            RecycleBinFunctions.RefreshSearch("");
-        }
-    }
-
-    void Restore (DirectoryInfo info)
-    {
-        if (EditorUtility.DisplayDialog("Recycle Bin", "Restore " + info.Name + "?", "Yes", "No"))
-        {
-            FileUtil.CopyFileOrDirectory(info.FullName, Path.Combine(Application.dataPath, info.Name));
-            FileUtil.DeleteFileOrDirectory(info.FullName);
-
-            AssetDatabase.Refresh();
-            RecycleBinFunctions.RefreshSearch("");
-        }
-    }
-        
+			EditorGUILayout.Space();
+
+			EditorGUI.BeginChangeCheck();
+
+			//Search field
+			EditorGUILayout.PropertyField(search, new GUIContent("Search"));
+
+			EditorGUILayout.Space();
+
+			//View folder content/data fields
+			showSubfolders = EditorGUILayout.Toggle(new GUIContent("View Folder Content"), showSubfolders);
+			showDate = EditorGUILayout.Toggle(new GUIContent("View Date"), showDate);
+
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				serializedObject.ApplyModifiedProperties();
+				RecycleBinFunctions.RefreshSearch(pref.search);
+			}
+
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+
+			//Draws files and directories.
+			for (int i = 0; i < list.Count; i++)
+			{
+				if (!RecycleBinFunctions.IsDirectory(list[i].path))
+				{
+					DrawFile(list[i].path, true, true);
+				}
+				else
+				{
+					DrawFolderRecursive(new DirectoryInfo(list[i].path), true);
+				}
+
+				EditorGUILayout.Space();
+			}
+
+			EditorGUILayout.Space();
+
+			//Draws Delete / Restore All 
+			DrawButtons();
+
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+
+			EditorPrefs.SetBool("show", showSubfolders);
+			EditorPrefs.SetBool("date", showDate);
+
+			serializedObject.ApplyModifiedProperties();
+		}
+
+		// Draws file. 
+		// parameter box: draws bounding box.
+		// parameter button: draws delete/restore buttons.
+		void DrawFile(string path, bool box, bool button)
+		{
+			FileInfo info = new FileInfo(path);
+
+			if (!box)
+			{
+				GUILayout.Label(new GUIContent("   " + Path.GetFileName(path), file));
+
+				GUILayout.BeginHorizontal();
+
+				if (button)
+				{
+					if (GUILayout.Button("Delete"))
+					{
+						Delete(new FileInfo(path));
+					}
+
+					if (GUILayout.Button("Restore"))
+					{
+						Restore(new FileInfo(path));
+					}
+				}
+
+				GUILayout.EndHorizontal();
+			}
+			else
+			{
+				EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+				GUILayout.Label(new GUIContent("  " + Path.GetFileName(path), file));
+
+				if (showDate)
+				{
+					GUILayoutOption date = GUILayout.Width(120);
+					GUILayout.Label(RecycleBinFunctions.FormatDate(info.LastAccessTime), date);
+				}
+
+				GUILayoutOption option = GUILayout.Width(65);
+
+				if (GUILayout.Button(new GUIContent("Delete"), option))
+				{
+					Delete(new FileInfo(path));
+				}
+				if (GUILayout.Button(new GUIContent("Restore"), option))
+				{
+					Restore(new FileInfo(path));
+				}
+
+				EditorGUILayout.EndHorizontal();
+			}
+		}
+
+		//Draws delete/restore/open buttons.
+		private void DrawButtons()
+		{
+			EditorGUILayout.BeginVertical();
+			EditorGUILayout.BeginHorizontal();
+
+			if (GUILayout.Button("Delete All"))
+			{
+				if (EditorUtility.DisplayDialog("Delete Trash?", "Are you sure you want to complete this action?", "Yes", "No"))
+				{
+					RecycleBinFunctions.ClearTrash();
+				}
+			}
+
+			if (GUILayout.Button("Restore All"))
+			{
+				if (EditorUtility.DisplayDialog("Restore Trash?", "Are you sure you want to complete this action?", "Yes", "No"))
+				{
+					RecycleBinFunctions.CopyFilesFromBinToAssetsFolder();
+				}
+			}
+
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.Space();
+
+			if (GUILayout.Button("Open Trash"))
+			{
+				FileFunctions.OpenFolder(RecycleBinFunctions.GetRecycleBin(true));
+			}
+
+			EditorGUILayout.EndVertical();
+		}
+
+		private void DrawFolderRecursive(DirectoryInfo info, bool buttons)
+		{
+			if (Directory.Exists(info.FullName))
+			{
+				EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+				EditorGUILayout.BeginHorizontal();
+
+				GUILayout.Label(new GUIContent("  " + info.Name, folder));
+
+
+				if (buttons)
+				{
+					if (showDate)
+					{
+						GUILayoutOption date = GUILayout.Width(120);
+
+						GUILayout.Label(RecycleBinFunctions.FormatDate(info.LastAccessTime), date);
+					}
+
+					GUILayoutOption option = GUILayout.Width(65);
+
+					if (GUILayout.Button(new GUIContent("Delete"), option))
+					{
+						Delete(info);
+					}
+
+					if (GUILayout.Button(new GUIContent("Restore"), option))
+					{
+						Restore(info);
+					}
+				}
+
+				EditorGUILayout.EndHorizontal();
+
+				if (showSubfolders)
+				{
+					if (Directory.Exists(info.FullName)) //Doesnt Draw Subfolders if parent was deleted, calling GetFiles or GetDirectories on an invalid folder throws exceptions
+					{
+						foreach (FileInfo file in info.GetFiles())
+						{
+							EditorGUI.indentLevel++;
+
+							EditorGUILayout.BeginHorizontal();
+							GUILayout.Space(30);
+							DrawFile(file.FullName, false, false);
+							EditorGUILayout.EndHorizontal();
+							EditorGUI.indentLevel--;
+
+							GUILayout.Space(5);
+						}
+
+						foreach (DirectoryInfo dir in info.GetDirectories())
+						{
+							EditorGUILayout.BeginHorizontal();
+							GUILayout.Space(30);
+							DrawFolderRecursive(dir, false);
+							EditorGUILayout.EndHorizontal();
+
+							GUILayout.Space(5);
+						}
+					}
+				}
+				EditorGUI.indentLevel--;
+
+				EditorGUILayout.EndVertical();
+			}
+		}
+
+		void Delete(DirectoryInfo info)
+		{
+			if (EditorUtility.DisplayDialog("Recycle Bin", "Delete " + info.Name + "?", "Yes", "No"))
+			{
+				FileUtil.DeleteFileOrDirectory(info.FullName);
+
+				RecycleBinFunctions.RefreshSearch("");
+			}
+		}
+
+		void Delete(FileInfo info)
+		{
+			if (EditorUtility.DisplayDialog("Recycle Bin", "Delete " + info.Name + "?", "Yes", "No"))
+			{
+				FileUtil.DeleteFileOrDirectory(info.FullName);
+
+				RecycleBinFunctions.RefreshSearch("");
+			}
+		}
+
+		void Restore(FileInfo info)
+		{
+			if (EditorUtility.DisplayDialog("Recycle Bin", "Restore " + info.Name + "?", "Yes", "No"))
+			{
+				FileUtil.CopyFileOrDirectory(info.FullName, Path.Combine(Application.dataPath, info.Name));
+				FileUtil.DeleteFileOrDirectory(info.FullName);
+
+				AssetDatabase.Refresh();
+				RecycleBinFunctions.RefreshSearch("");
+			}
+		}
+
+		void Restore(DirectoryInfo info)
+		{
+			if (EditorUtility.DisplayDialog("Recycle Bin", "Restore " + info.Name + "?", "Yes", "No"))
+			{
+				FileUtil.CopyFileOrDirectory(info.FullName, Path.Combine(Application.dataPath, info.Name));
+				FileUtil.DeleteFileOrDirectory(info.FullName);
+
+				AssetDatabase.Refresh();
+				RecycleBinFunctions.RefreshSearch("");
+			}
+		}
+
+	}
 }
