@@ -46,4 +46,9 @@ public class RecycleBinPreferences : ScriptableObject
 			return false;
 		}
     }
+
+    public static RecycleBinPreferences Create(out string path)
+	{
+		return ScriptableObjectUtility.CreateAsset<RecycleBinPreferences>(out path);
+	}
 }

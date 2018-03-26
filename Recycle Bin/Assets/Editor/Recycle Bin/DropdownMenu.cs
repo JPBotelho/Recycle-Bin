@@ -16,7 +16,7 @@ namespace JPBotelho
 			}
 			else
 			{
-				RecycleBinFunctions.CreateRecycleBinPreferences(out path);
+				RecycleBinPreferences.Create(out path);
 
 				Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(path);
 			}

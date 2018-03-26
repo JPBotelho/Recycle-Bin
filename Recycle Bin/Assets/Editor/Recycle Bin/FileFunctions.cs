@@ -28,30 +28,22 @@ namespace JPBotelho
 
 		public static List<string> GetFilesAndDirectories(DirectoryInfo target)
 		{
-			List<string> paths = new List<string>(Directory.GetFiles(target.FullName)); //Gets all paths
-			paths.AddRange(Directory.GetDirectories(target.FullName)); //Gets all directories
+			List<string> paths = new List<string>();			
+			paths.AddRange(Directory.GetFiles(target.FullName));
+			paths.AddRange(Directory.GetDirectories(target.FullName));
 
-		/*		foreach (string s in paths)
-				{
-					// "" returns everything. It's the default case.
-					if (search == "" || s.ToLower().Contains(search.ToLower()))
-					{
-						trash.Add(new TrashFile(s));
-					}
-				}*/
-			
 			return paths;
 		}
 
 		//Copies files or directories to a target directory. 
 		//Members with the same name get (X) added after.
-		//Recursive behaviour is handled by unity's CopyFileOrDirectory (doesn't handle matching names, hence this function)-
+		//Recursion is handled by unity's CopyFileOrDirectory (doesn't handle matching names, hence this function)-
 		public static void CopyFileOrDirectory(string path, DirectoryInfo to)
 		{
-			//Directories need some separate logic, but the implementation is the same.
-			bool isDirectory = RecycleBinFunctions.IsDirectory(path);
+			//Directories need some separate logic, but the implementation is nearly the same.
+			bool isDirectory = IsDirectory(path);
 
-			//If it's a file it will have extension, else it won't, so no need to use DirectoryInfo
+			//If it's a file it will have extension, else it won't, no need to use DirectoryInfo
 			FileInfo file = new FileInfo(path);
 
 			string targetPath = Path.Combine(to.FullName, file.Name);
@@ -93,6 +85,14 @@ namespace JPBotelho
 				FileUtil.CopyFileOrDirectory(path, finalDestination);
 			}
 			
+		}
+
+		//Checks if path is a folder. If not, it's a file.
+		public static bool IsDirectory(string path)
+		{
+			FileAttributes attr = File.GetAttributes(path);
+
+			return (attr & FileAttributes.Directory) == FileAttributes.Directory;
 		}
 	}
 }

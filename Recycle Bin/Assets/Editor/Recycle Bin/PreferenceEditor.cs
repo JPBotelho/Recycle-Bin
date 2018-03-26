@@ -28,7 +28,7 @@ namespace JPBotelho
 
 		public void OnEnable()
 		{
-			recycleBin = RecycleBinFunctions.recycleBin;
+			recycleBin = RecycleBinFunctions.recycleBinPath;
 
 			showSubfolders = EditorPrefs.GetBool("show");
 			showDate = EditorPrefs.GetBool("date");
@@ -124,7 +124,7 @@ namespace JPBotelho
 			//Draws files and directories.
 			for (int i = 0; i < list.Count; i++)
 			{
-				if (!RecycleBinFunctions.IsDirectory(list[i].path))
+				if (!FileFunctions.IsDirectory(list[i].path))
 				{
 					DrawFile(list[i].path, true, true);
 				}
@@ -217,7 +217,7 @@ namespace JPBotelho
 			{
 				if (EditorUtility.DisplayDialog("Delete Trash?", "Are you sure you want to complete this action?", "Yes", "No"))
 				{
-					RecycleBinFunctions.ClearTrash();
+					RecycleBinFunctions.ClearRecycleBinDirectory();
 				}
 			}
 
