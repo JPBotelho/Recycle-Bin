@@ -302,15 +302,19 @@ namespace JPBotelho
 				{
 					int i = 1;
 
+                    //Remove the extension
 					string replace = path.Replace(info.Extension, "");
 
 					string newName;
 
 					while (true)
 					{
+						//        MyFile         (i)        .extension
 						newName = replace + " (" + i + ")" + info.Extension;
 
-						if (File.Exists(Path.Combine(to.FullName, new FileInfo(newName).Name)))
+						string currentDestination = Path.Combine(to.FullName, new FileInfo(newName).Name);
+
+						if (File.Exists(currentDestination))
 							i++;
 						else
 							break;
@@ -327,9 +331,9 @@ namespace JPBotelho
 			{
 				DirectoryInfo info = new DirectoryInfo(path);
 
-				string first = Path.Combine(to.FullName, info.Name);
+				string destination = Path.Combine(to.FullName, info.Name);
 
-				if (Directory.Exists(first))
+				if (Directory.Exists(destination))
 				{
 					int i = 1;
 
@@ -341,8 +345,10 @@ namespace JPBotelho
 					{
 						newName = replace + " (" + i + ")" + info.Extension;
 
-						if (Directory.Exists(Path.Combine(to.FullName, new DirectoryInfo(newName).Name)))
-							i++;
+						string currentDestination = Path.Combine(to.FullName, new DirectoryInfo(newName).Name);
+
+						if (Directory.Exists(currentDestination))
+						    i++;
 						else
 							break;
 					}
@@ -351,7 +357,7 @@ namespace JPBotelho
 				}
 				else
 				{
-					FileUtil.CopyFileOrDirectory(path, first);
+					FileUtil.CopyFileOrDirectory(path, destination);
 				}
 			}
 		}
