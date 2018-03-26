@@ -8,7 +8,7 @@ public static class ScriptableObjectUtility
     /// <summary>
     //	This makes it easy to create, name and place unique new ScriptableObject asset files.
     /// </summary>
-    public static void CreateAsset<T> () where T : ScriptableObject
+    public static T CreateAsset<T> (out string finalPath) where T : ScriptableObject
     {
         T asset = ScriptableObject.CreateInstance<T>();
 
@@ -30,6 +30,9 @@ public static class ScriptableObjectUtility
         AssetDatabase.Refresh();
         EditorUtility.FocusProjectWindow();
         Selection.activeObject = asset;
+
+		finalPath = assetPathAndName;
+		return asset;
     }
 
     public static List<T> FindAssetsByType<T> () where T : Object

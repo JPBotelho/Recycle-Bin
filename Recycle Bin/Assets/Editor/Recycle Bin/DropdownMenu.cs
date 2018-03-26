@@ -14,11 +14,9 @@ public class DropdownMenu : EditorWindow
         }
         else
         {
-            ScriptableObjectUtility.CreateAsset<RecycleBinPreferences>();
+			RecycleBinFunctions.CreateRecycleBinPreferences(out path);
 
-            path = AssetDatabase.GetAssetPath(RecycleBinFunctions.GetRecycleBinPreferences());
-
-            Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(path);
+			Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(path);
         }
 
         RecycleBinFunctions.RefreshSearch("");

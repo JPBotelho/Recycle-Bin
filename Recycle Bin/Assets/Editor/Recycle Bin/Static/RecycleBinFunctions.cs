@@ -30,7 +30,7 @@ public static class RecycleBinFunctions
         if (!Directory.Exists(Path.Combine(projectFolder, recycleBinPreferences.folderName)))
         {
             if (create)
-                CreateRecycleBin();
+                CreateRecycleBinDirectory();
         }
         
         return GetProjectFolder() + "/" + recycleBinPreferences.folderName;        
@@ -39,7 +39,7 @@ public static class RecycleBinFunctions
     /// <summary>
     /// Creates a Trash Folder
     /// </summary>
-    public static void CreateRecycleBin()
+    public static void CreateRecycleBinDirectory()
     {
         Directory.CreateDirectory(Path.Combine(projectFolder, recycleBinPreferences.folderName));
     }
@@ -103,6 +103,12 @@ public static class RecycleBinFunctions
     public static void OpenFolder (string path)
     {        
         System.Diagnostics.Process.Start(path);        
+    }
+
+    public static RecycleBinPreferences CreateRecycleBinPreferences(out string path)
+    {
+        
+		return ScriptableObjectUtility.CreateAsset<RecycleBinPreferences>(out path);
     }
 
     /// <summary>
