@@ -10,14 +10,7 @@ namespace JPBotelho
 		//Deletes all members of a directory.
 		public static void ClearDirectory(DirectoryInfo info)
 		{
-			foreach (FileInfo file in info.GetFiles())
-			{
-				file.Delete();
-			}
-			foreach (DirectoryInfo dir in info.GetDirectories())
-			{
-				dir.Delete(true);
-			}
+			info.Delete(true);
 		}
 
 		/// Opens a folder in the windows explorer
@@ -83,8 +76,7 @@ namespace JPBotelho
 				}
 
 				FileUtil.CopyFileOrDirectory(path, finalDestination);
-			}
-			
+			}			
 		}
 
 		//Checks if path is a folder. If not, it's a file.
