@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEditor;
 
 namespace JPBotelho
 {
@@ -40,6 +41,76 @@ namespace JPBotelho
 				}*/
 			
 			return paths;
+		}
+
+		public static void CopyFile(string path, DirectoryInfo to)
+		{
+			FileInfo info = new FileInfo(path);
+
+			string first = Path.Combine(to.FullName, info.Name);
+
+			if (File.Exists(first))
+			{
+				int i = 1;
+
+				//Remove the extension
+				string replace = path.Replace(info.Extension, "");
+
+				string newName;
+
+				while (true)
+				{
+					//        MyFile         (i)        .extension
+					newName = replace + " (" + i + ")" + info.Extension;
+
+					string currentDestination = Path.Combine(to.FullName, new FileInfo(newName).Name);
+
+					if (File.Exists(currentDestination))
+						i++;
+					else
+						break;
+				}
+
+				FileUtil.CopyFileOrDirectory(path, Path.Combine(to.FullName, new FileInfo(newName).Name));
+			}
+			else
+			{
+				FileUtil.CopyFileOrDirectory(path, first);
+			}
+		}
+
+		public static void CopyDirectory(string path, DirectoryInfo to)
+		{
+			DirectoryInfo info = new DirectoryInfo(path);
+
+			string destination = Path.Combine(to.FullName, info.Name);
+
+			if (Directory.Exists(destination))
+			{
+				int i = 1;
+
+				string replace = path.Replace(info.Extension, "");
+
+				string newName;
+
+				while (true)
+				{
+					newName = replace + " (" + i + ")" + info.Extension;
+
+					string currentDestination = Path.Combine(to.FullName, new DirectoryInfo(newName).Name);
+
+					if (Directory.Exists(currentDestination))
+						i++;
+					else
+						break;
+				}
+
+				FileUtil.CopyFileOrDirectory(path, Path.Combine(to.FullName, new DirectoryInfo(newName).Name));
+			}
+			else
+			{
+				FileUtil.CopyFileOrDirectory(path, destination);
+			}
 		}
 	}
 }

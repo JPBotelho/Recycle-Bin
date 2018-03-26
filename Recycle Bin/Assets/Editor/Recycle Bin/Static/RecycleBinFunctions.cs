@@ -294,71 +294,11 @@ namespace JPBotelho
 		{
 			if (!IsDirectory(path))
 			{
-				FileInfo info = new FileInfo(path);
-
-				string first = Path.Combine(to.FullName, info.Name);
-
-				if (File.Exists(first))
-				{
-					int i = 1;
-
-                    //Remove the extension
-					string replace = path.Replace(info.Extension, "");
-
-					string newName;
-
-					while (true)
-					{
-						//        MyFile         (i)        .extension
-						newName = replace + " (" + i + ")" + info.Extension;
-
-						string currentDestination = Path.Combine(to.FullName, new FileInfo(newName).Name);
-
-						if (File.Exists(currentDestination))
-							i++;
-						else
-							break;
-					}
-
-					FileUtil.CopyFileOrDirectory(path, Path.Combine(to.FullName, new FileInfo(newName).Name));
-				}
-				else
-				{
-					FileUtil.CopyFileOrDirectory(path, first);
-				}
+				FileFunctions.CopyFile(path, to);
 			}
 			else
 			{
-				DirectoryInfo info = new DirectoryInfo(path);
-
-				string destination = Path.Combine(to.FullName, info.Name);
-
-				if (Directory.Exists(destination))
-				{
-					int i = 1;
-
-					string replace = path.Replace(info.Extension, "");
-
-					string newName;
-
-					while (true)
-					{
-						newName = replace + " (" + i + ")" + info.Extension;
-
-						string currentDestination = Path.Combine(to.FullName, new DirectoryInfo(newName).Name);
-
-						if (Directory.Exists(currentDestination))
-						    i++;
-						else
-							break;
-					}
-
-					FileUtil.CopyFileOrDirectory(path, Path.Combine(to.FullName, new DirectoryInfo(newName).Name));
-				}
-				else
-				{
-					FileUtil.CopyFileOrDirectory(path, destination);
-				}
+				FileFunctions.CopyDirectory(path, to);
 			}
 		}
 	}
