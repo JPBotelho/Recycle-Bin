@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
-public class Preferences : ScriptableObject 
+public class RecycleBinPreferences : ScriptableObject 
 {
     public List<string> includeExtensions = new List<string>()
     {

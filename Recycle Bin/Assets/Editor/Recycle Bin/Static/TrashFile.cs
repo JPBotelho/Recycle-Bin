@@ -15,6 +15,7 @@ public sealed class TrashFile
     }   
 }
 
+//Compares two "trash files" by last write date.
 public class ComparerByDate : IComparer<TrashFile>
 {
     public int Compare (TrashFile obj, TrashFile obj2)
@@ -22,6 +23,6 @@ public class ComparerByDate : IComparer<TrashFile>
         FileInfo file = new FileInfo(obj.path);
         FileInfo otherfile = new FileInfo(obj2.path);
 
-        return -file.LastAccessTimeUtc.CompareTo(otherfile.LastAccessTimeUtc);
+        return -file.LastAccessTimeUtc.CompareTo(otherfile.LastWriteTimeUtc);
     }
 }

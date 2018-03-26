@@ -3,7 +3,7 @@ using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(Preferences))]
+[CustomEditor(typeof(RecycleBinPreferences))]
 public class PreferenceEditor : Editor 
 {
     SerializedProperty all;
@@ -14,7 +14,7 @@ public class PreferenceEditor : Editor
     public static GUIStyle skin = new GUIStyle();
                 
     bool settings; //Foldout
-    Preferences pref;
+    RecycleBinPreferences pref;
 
     bool showSubfolders = true;
     bool showDate = true;
@@ -31,7 +31,7 @@ public class PreferenceEditor : Editor
         showSubfolders = EditorPrefs.GetBool("show");
         showDate = EditorPrefs.GetBool("date");
 
-        pref = (Preferences)target;
+        pref = (RecycleBinPreferences)target;
         
         skin.alignment = TextAnchor.MiddleCenter;
         skin.fontStyle = FontStyle.Bold;

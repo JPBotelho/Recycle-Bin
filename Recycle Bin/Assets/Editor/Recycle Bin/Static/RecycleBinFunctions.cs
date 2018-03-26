@@ -7,26 +7,17 @@ public static class RecycleBinFunctions
 {	
     public static string recycleBin
     {
-        get
-        {
-            return GetRecycleBin(false);
-        }
+        get { return GetRecycleBin(false); }
     }
 
-    public static Preferences recycleBinPreferences
+    public static RecycleBinPreferences recycleBinPreferences
     {
-        get
-        {
-            return GetPreferences();
-        }
+        get { return GetRecycleBinPreferences(); }
     }
 
     public static string projectFolder
     {
-        get
-        {
-            return GetProjectFolder();
-        }
+        get { return GetProjectFolder(); }
     }
 
     /// <summary>
@@ -36,15 +27,13 @@ public static class RecycleBinFunctions
     /// <returns></returns>
     public static string GetRecycleBin(bool create)
     {
-        Preferences prefs = GetPreferences();
-
-        if (!Directory.Exists(Path.Combine(projectFolder, prefs.folderName)))
+        if (!Directory.Exists(Path.Combine(projectFolder, recycleBinPreferences.folderName)))
         {
             if (create)
                 CreateRecycleBin();
         }
         
-        return GetProjectFolder() + "/" + prefs.folderName;        
+        return GetProjectFolder() + "/" + recycleBinPreferences.folderName;        
     }
 
     /// <summary>
@@ -59,9 +48,9 @@ public static class RecycleBinFunctions
     /// Returns the Preferences scriptable object (.asset file).
     /// </summary>
     /// <returns></returns>
-    public static Preferences GetPreferences()
+    public static RecycleBinPreferences GetRecycleBinPreferences()
     {
-        List<Preferences> prefs = ScriptableObjectUtility.FindAssetsByType<Preferences>();
+        List<RecycleBinPreferences> prefs = ScriptableObjectUtility.FindAssetsByType<RecycleBinPreferences>();
         
         //Multiple instances?
         if (prefs.Count >= 1)

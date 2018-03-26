@@ -6,7 +6,7 @@ public class DropdownMenu : EditorWindow
     [MenuItem("Window/Recycle Bin/Show")]
     public static void ShowWindow ()
     {
-        string path = AssetDatabase.GetAssetPath(RecycleBinFunctions.GetPreferences());
+        string path = AssetDatabase.GetAssetPath(RecycleBinFunctions.GetRecycleBinPreferences());
 
         if (!string.IsNullOrEmpty(path))
         {
@@ -14,9 +14,9 @@ public class DropdownMenu : EditorWindow
         }
         else
         {
-            ScriptableObjectUtility.CreateAsset<Preferences>();
+            ScriptableObjectUtility.CreateAsset<RecycleBinPreferences>();
 
-            path = AssetDatabase.GetAssetPath(RecycleBinFunctions.GetPreferences());
+            path = AssetDatabase.GetAssetPath(RecycleBinFunctions.GetRecycleBinPreferences());
 
             Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(path);
         }
