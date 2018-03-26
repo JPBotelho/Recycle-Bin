@@ -27,15 +27,17 @@ namespace JPBotelho
 		/// </summary>
 		/// <param name="create">Create folder if it doesn't exist.</param>
 		/// <returns></returns>
-		public static string GetRecycleBin(bool create)
+		public static string GetRecycleBin(bool createDirectoryIfNull)
 		{
-			if (!Directory.Exists(Path.Combine(projectFolder, recycleBinPreferences.folderName)))
+			string expectedRecycleBinPath = Path.Combine(projectFolder, recycleBinPreferences.folderName);
+
+			if (!Directory.Exists(expectedRecycleBinPath))
 			{
-				if (create)
+				if (createDirectoryIfNull)
 					CreateRecycleBinDirectory();
 			}
 
-			return GetProjectFolder() + "/" + recycleBinPreferences.folderName;
+			return expectedRecycleBinPath;
 		}
 
 		/// <summary>
@@ -114,14 +116,18 @@ namespace JPBotelho
 
 			if (IsDirectory(assetPath))
 			{
-				//Deleted Directory            //Recycle Bin Folder / DeletedFolderName                          //Generate SubFolders         
-				CopyFilesRecursively(new DirectoryInfo(assetPath), new DirectoryInfo(Path.Combine(GetRecycleBin(true), file.Name)), true);
+				DirectoryInfo currentDirectory = new DirectoryInfo(assetPath);
+
+				string recycleBinPath = GetRecycleBin(true);
+				string pathInRecycleBin = Path.Combine(recycleBinPath, assetPath);
+
+				DirectoryInfo finalDirectory = new DirectoryInfo(pathInRecycleBin);
+				CopyFilesRecursively(currentDirectory, finalDirectory, true);
 			}
 			else
 			{   //Just a couple checks based on file's extension
 				if (recycleBinPreferences.IsEligibleToSave(file))
 				{
-					//FileUtil.CopyFileOrDirectory(assetPath, Path.Combine(GetRecycleBin(true), path.Name));
 					CopyFileOrDirectory(assetPath, new DirectoryInfo(GetRecycleBin(true)));
 				}
 
