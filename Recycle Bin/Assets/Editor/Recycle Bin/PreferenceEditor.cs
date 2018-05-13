@@ -38,8 +38,8 @@ namespace JPBotelho
 			skin.alignment = TextAnchor.MiddleCenter;
 			skin.fontStyle = FontStyle.Bold;
 
-			folder = (Texture)AssetDatabase.LoadMainAssetAtPath("Assets/folder.png");
-			file = (Texture)AssetDatabase.LoadMainAssetAtPath("Assets/file.png");
+			folder = (Texture)AssetDatabase.LoadMainAssetAtPath("Assets/Gizmos/folder.png");
+			file = (Texture)AssetDatabase.LoadMainAssetAtPath("Assets/Gizmos/file.png");
 
 			all = serializedObject.FindProperty("saveAll");
 			none = serializedObject.FindProperty("saveNone");
